@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import Map from "./components/map";
 import Measurements from "./components/measurements";
-import Records from "../data/records.json";
 import Routes from "./components/routes";
 import "./app.css";
 
@@ -37,13 +36,11 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
+    <>
+      <Map route={route}></Map>
       <Routes routes={records?.routes} onChange={onChange}></Routes>
-      <div className="info">
-        <Map></Map>
-        <Measurements route={route}></Measurements>
-      </div>
-    </div>
+      <Measurements route={route}></Measurements>
+    </>
   );
 }
 

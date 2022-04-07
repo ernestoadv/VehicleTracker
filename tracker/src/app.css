@@ -1,59 +1,63 @@
 body {
   background-color: #ffffff;
-}
-
-.app {
   color: hsl(0, 0%, 50%);
-  display: flex;
   font-family: "Open Sans", sans-serif;
   font-size: 14pt;
-  flex-direction: column;
-  margin: 7% 7%;
-}
-
-.info {
-  display: flex;
-  flex-direction: row;
-  height: 60vh;
-  justify-content: space-between;
-  margin-top: 4%;
 }
 
 .map {
-  border-color: hsl(0, 0%, 80%);
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
-  width: 65%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: -webkit-fill-available;
+  width: -webkit-fill-available;
+  z-index: -1;
 }
 
 .measurements {
-  border-color: hsl(0, 0%, 80%);
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.24);
   display: grid;
   grid-template-rows: 2fr 4fr 4fr;
-  padding: 4% 4% 4% 5%;
-  width: 22%;
+  position: absolute;
+  padding: 3% 3% 3% 3%;
+  margin-right: 10px;
+  right: 0;
+  top: 10vh;
+  height: 50vh;
+  width: 20vw;
 }
 
 .measurements > div {
   align-content: flex-start;
   display: grid;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .measurement-header {
   border-bottom: 1px solid hsl(0, 0%, 80%);
   display: flex;
+  font-size: 14pt;
   justify-content: center;
   width: 100%;
+  @media (max-width: 600px) {
+    font-size: 3vw;
+  }
+  @media (min-width: 1920px) {
+    font-size: 20pt;
+  }
 }
 
 .measurement-content {
   display: grid;
   font-size: 10pt;
+  @media (max-width: 600px) {
+    font-size: 2vw;
+  }
+  @media (min-width: 1920px) {
+    font-size: 15pt;
+  }
 }
 
 .measurement-content span {
@@ -66,10 +70,17 @@ body {
 }
 
 .routes {
-  display: flex;
-  justify-content: center;
+  position: absolute;
+  left: 33vw;
+  margin-top: 10px;
+  top: 0;
+  width: 33vw;
+  @media (max-width: 600px) {
+    left: 40vw;
+  }
 }
 
-.routes-select {
-  width: 30%;
+.css-1s2u09g-control {
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.14);
 }

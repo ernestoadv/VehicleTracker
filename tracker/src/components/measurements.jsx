@@ -68,15 +68,15 @@ function Measurements(props) {
       });
       setSpeed({
         averageSpeed: {
-          value: speed?.average?.value || "-",
+          value: Math.round(speed?.average?.value * 1000) / 1000 || "-",
           unit: speed?.average?.unit || "-",
         },
         maxSpeed: {
-          value: speed?.max?.value || "-",
+          value: Math.round(speed?.max?.value * 1000) / 1000 || "-",
           unit: speed?.max?.unit || "-",
         },
         movingSpeed: {
-          value: speed?.moving?.value || "-",
+          value: Math.round(speed?.moving?.value * 1000) / 1000 || "-",
           unit: speed?.moving?.unit || "-",
         },
       });
