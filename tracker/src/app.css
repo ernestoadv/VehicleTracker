@@ -1,0 +1,75 @@
+body {
+  background-color: #ffffff;
+}
+
+.app {
+  color: hsl(0, 0%, 50%);
+  display: flex;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14pt;
+  flex-direction: column;
+  margin: 7% 7%;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  height: 60vh;
+  justify-content: space-between;
+  margin-top: 4%;
+}
+
+.map {
+  border-color: hsl(0, 0%, 80%);
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  width: 65%;
+}
+
+.measurements {
+  border-color: hsl(0, 0%, 80%);
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  display: grid;
+  grid-template-rows: 2fr 4fr 4fr;
+  padding: 4% 4% 4% 5%;
+  width: 22%;
+}
+
+.measurements > div {
+  align-content: flex-start;
+  display: grid;
+  overflow: auto;
+}
+
+.measurement-header {
+  border-bottom: 1px solid hsl(0, 0%, 80%);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.measurement-content {
+  display: grid;
+  font-size: 10pt;
+}
+
+.measurement-content span {
+  padding: 2% 0;
+}
+
+.measurement-content label {
+  color: hsl(0, 0%, 20%);
+  font-weight: bold;
+}
+
+.routes {
+  display: flex;
+  justify-content: center;
+}
+
+.routes-select {
+  width: 30%;
+}

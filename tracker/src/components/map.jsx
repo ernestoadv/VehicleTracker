@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import { Client } from "@googlemaps/google-maps-services-js";
 
 function Map(props) {
-  useEffect(() => {
-    console.log("Map useEffect");
-  }, []);
+  useEffect(() => {}, []);
 
-  return <div>MAPA</div>;
+  return <div className="map">Mapa</div>;
 }
 
 export default Map;
