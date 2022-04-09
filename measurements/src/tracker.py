@@ -61,7 +61,7 @@ for file in os.listdir(out_dir):
 records_file = open('../out/records.json', 'w')
 
 # Create JSON
-records = json.dumps({"records": found_files,})
+records = json.dumps({"routes": found_files,})
 
 # Save JSON into file
 records_file.write(records)

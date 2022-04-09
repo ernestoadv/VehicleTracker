@@ -170,6 +170,7 @@ class Route():
         write_file = open('../out/' + name + '.json', 'w')
 
         # Create JSON
+        current = name == 'current'
         route = json.dumps({
             "coordinates": [coord.__dict__ for coord in self.coordinates],
             "distance": {
@@ -203,14 +204,15 @@ class Route():
                     "value": self.moving_speed(),
                     "unit": "km/h"
                 }
-            }
+            },
+            "current": current,
         })
 
         # Save JSON into file
         write_file.write(route)
 
         # Return whether file is the current route or not
-        return name == "current"
+        return current
 
 #################################################
 ##                 End of file                 ##
