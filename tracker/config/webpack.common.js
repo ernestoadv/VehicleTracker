@@ -1,6 +1,8 @@
 /** @type {import('webpack').Configuration} */
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const DotenvWebpackPlugin = require("dotenv-webpack");
 const path = require("path");
 
 module.exports = {
@@ -26,6 +28,11 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
+    new DotenvWebpackPlugin(),
+    new EnvironmentPlugin({
+      GOOGLE_MAPS_API_KEY: "AIzaSyCZgE5vU4EUwC3vqakIV4SPwJ79JcDYmX4",
+      ROADS_API: "https://roads.googleapis.com/v1/snapToRoads",
+    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),

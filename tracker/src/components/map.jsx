@@ -36,7 +36,7 @@ const ZOOM_VALUE = 16;
 
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyCZgE5vU4EUwC3vqakIV4SPwJ79JcDYmX4",
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
   });
   const [center, setCenter] = useState(DEFAULT_CENTER);
   const [end, setEnd] = useState(null);
@@ -85,14 +85,13 @@ function Map(props) {
       const { coordinates } = route;
       if (coordinates?.length > 0) {
         const road = fetchRoad(coordinates)?.data;
-        const init = { lat: road[0]?.lat, lng: road[0]?.lng };
-        const end = {
-          lat: road[road.length - 1]?.lat,
-          lng: road[road.length - 1]?.lng,
-        };
-        setCenter(init);
-        setInit(init);
-        setEnd(end);
+        const { lat, lng } = road[0];
+        setCenter({
+          lat: lat - 0.004,
+          lng,
+        });
+        setInit(road[0]);
+        setEnd(road[road.length - 1]);
         setRoad(road);
         setZoom(ZOOM_VALUE);
       }
