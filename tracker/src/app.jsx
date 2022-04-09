@@ -10,11 +10,14 @@ function App() {
   const [records, setRecords] = useState(null);
   const [route, setRoute] = useState(null);
 
-  const onChange = (route) => {
-    setRoute(route);
+  const onChangeRoute = (route) => {
+    new Promise((resolve) => {
+      const data = import("../data/" + route);
+      resolve(data);
+    }).then((data) => setRoute(data));
   };
 
-  const onFetch = () => {
+  const onFetchRecords = () => {
     new Promise((resolve) => {
       const data = import("../data/records.json");
       resolve(data);
@@ -26,9 +29,9 @@ function App() {
   };
 
   useEffect(() => {
-    onFetch();
+    onFetchRecords();
     const fetchRecords = setInterval(() => {
-      onFetch();
+      onFetchRecords();
     }, RECORDS_INTERVAL * 1000);
     return () => {
       clearInterval(fetchRecords);
@@ -38,7 +41,7 @@ function App() {
   return (
     <>
       <Map route={route}></Map>
-      <Routes routes={records?.routes} onChange={onChange}></Routes>
+      <Routes routes={records?.routes} onChange={onChangeRoute}></Routes>
       <Measurements route={route}></Measurements>
     </>
   );

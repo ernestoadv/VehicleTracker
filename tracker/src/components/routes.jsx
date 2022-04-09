@@ -43,12 +43,7 @@ function Routes(props) {
 
   return (
     <div className="routes">
-      <Select
-        value={currentRoute}
-        options={allRoutes}
-        className={"routes-select"}
-        onChange={onChange}
-      />
+      <Select onChange={onChange} options={allRoutes} value={currentRoute} />
     </div>
   );
 }

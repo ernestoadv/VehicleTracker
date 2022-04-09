@@ -2,38 +2,17 @@ import { memo, useEffect, useState } from "react";
 
 function Measurements(props) {
   const [distance, setDistance] = useState({
-    totalDistance: {
-      value: "-",
-      unit: "km",
-    },
+    totalDistance: null,
   });
   const [time, setTime] = useState({
-    totalTime: {
-      value: "-",
-      unit: "hh/mm/ss",
-    },
-    movingTime: {
-      value: "-",
-      unit: "hh/mm/ss",
-    },
-    stoppedTime: {
-      value: "-",
-      unit: "hh/mm/ss",
-    },
+    totalTime: null,
+    movingTime: null,
+    stoppedTime: null,
   });
   const [speed, setSpeed] = useState({
-    averageSpeed: {
-      value: "-",
-      unit: "km/h",
-    },
-    maxSpeed: {
-      value: "-",
-      unit: "km/h",
-    },
-    movingSpeed: {
-      value: "-",
-      unit: "km/h",
-    },
+    averageSpeed: null,
+    maxSpeed: null,
+    movingSpeed: null,
   });
 
   useEffect(() => {
@@ -41,45 +20,41 @@ function Measurements(props) {
 
     if (!route) return;
 
-    new Promise((resolve) => {
-      const data = import("../../data/" + route);
-      resolve(data);
-    }).then((data) => {
-      const { distance, time, speed } = data;
-      setDistance({
-        totalDistance: {
-          value: Math.round(distance?.value * 1000) / 1000 || "-",
-          unit: distance?.unit || "-",
-        },
-      });
-      setTime({
-        totalTime: {
-          value: time?.total?.value || "-",
-          unit: time?.total?.unit || "-",
-        },
-        movingTime: {
-          value: time?.moving?.value || "-",
-          unit: time?.moving?.unit || "-",
-        },
-        stoppedTime: {
-          value: time?.stopped?.value || "-",
-          unit: time?.stopped?.unit || "-",
-        },
-      });
-      setSpeed({
-        averageSpeed: {
-          value: Math.round(speed?.average?.value * 1000) / 1000 || "-",
-          unit: speed?.average?.unit || "-",
-        },
-        maxSpeed: {
-          value: Math.round(speed?.max?.value * 1000) / 1000 || "-",
-          unit: speed?.max?.unit || "-",
-        },
-        movingSpeed: {
-          value: Math.round(speed?.moving?.value * 1000) / 1000 || "-",
-          unit: speed?.moving?.unit || "-",
-        },
-      });
+    const { distance, time, speed } = route;
+
+    setDistance({
+      totalDistance: {
+        value: Math.round(distance?.value * 1000) / 1000 || "-",
+        unit: distance?.unit || "-",
+      },
+    });
+    setTime({
+      totalTime: {
+        value: time?.total?.value || "-",
+        unit: time?.total?.unit || "-",
+      },
+      movingTime: {
+        value: time?.moving?.value || "-",
+        unit: time?.moving?.unit || "-",
+      },
+      stoppedTime: {
+        value: time?.stopped?.value || "-",
+        unit: time?.stopped?.unit || "-",
+      },
+    });
+    setSpeed({
+      averageSpeed: {
+        value: Math.round(speed?.average?.value * 1000) / 1000 || "-",
+        unit: speed?.average?.unit || "-",
+      },
+      maxSpeed: {
+        value: Math.round(speed?.max?.value * 1000) / 1000 || "-",
+        unit: speed?.max?.unit || "-",
+      },
+      movingSpeed: {
+        value: Math.round(speed?.moving?.value * 1000) / 1000 || "-",
+        unit: speed?.moving?.unit || "-",
+      },
     });
   }, [props.route]);
 
@@ -88,44 +63,53 @@ function Measurements(props) {
   const { averageSpeed, maxSpeed, movingSpeed } = speed;
 
   return (
-    <div className="measurements">
-      <div className="distance">
-        <div className="measurement-header">Distance</div>
-        <div className="measurement-content">
-          <span>
-            Total: <label>{totalDistance?.value}</label> {totalDistance?.unit}
-          </span>
+    (totalDistance ||
+      totalTime ||
+      movingTime ||
+      stoppedTime ||
+      averageSpeed ||
+      maxSpeed ||
+      movingSpeed) && (
+      <div className="measurements">
+        <div className="distance">
+          <div className="measurement-header">Distance</div>
+          <div className="measurement-content">
+            <span>
+              Total: <label>{totalDistance?.value}</label> {totalDistance?.unit}
+            </span>
+          </div>
+        </div>
+        <div className="time">
+          <div className="measurement-header">Time</div>
+          <div className="measurement-content">
+            <span>
+              Total: <label>{totalTime?.value}</label> {totalTime?.unit}
+            </span>
+            <span>
+              Moving: <label>{movingTime?.value}</label> {movingTime?.unit}
+            </span>
+            <span>
+              Stopped: <label>{stoppedTime?.value} </label> {stoppedTime?.unit}
+            </span>
+          </div>
+        </div>
+        <div className="speed">
+          <div className="measurement-header">Speed</div>
+          <div className="measurement-content">
+            <span>
+              Average: <label>{averageSpeed?.value} </label>{" "}
+              {averageSpeed?.unit}
+            </span>
+            <span>
+              Max: <label>{maxSpeed?.value} </label> {maxSpeed?.unit}
+            </span>
+            <span>
+              Moving: <label>{movingSpeed?.value} </label> {movingSpeed?.unit}
+            </span>
+          </div>
         </div>
       </div>
-      <div className="time">
-        <div className="measurement-header">Time</div>
-        <div className="measurement-content">
-          <span>
-            Total: <label>{totalTime?.value}</label> {totalTime?.unit}
-          </span>
-          <span>
-            Moving: <label>{movingTime?.value}</label> {movingTime?.unit}
-          </span>
-          <span>
-            Stopped: <label>{stoppedTime?.value} </label> {stoppedTime?.unit}
-          </span>
-        </div>
-      </div>
-      <div className="speed">
-        <div className="measurement-header">Speed</div>
-        <div className="measurement-content">
-          <span>
-            Average: <label>{averageSpeed?.value} </label> {averageSpeed?.unit}
-          </span>
-          <span>
-            Max: <label>{maxSpeed?.value} </label> {maxSpeed?.unit}
-          </span>
-          <span>
-            Moving: <label>{movingSpeed?.value} </label> {movingSpeed?.unit}
-          </span>
-        </div>
-      </div>
-    </div>
+    )
   );
 }
 
