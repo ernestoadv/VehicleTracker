@@ -12,7 +12,7 @@ import json, os
 ##                                             ##
 
 data_dir = '../data/'
-out_dir = '../out/'
+out_dir = '../../tracker/data/'
 found_current = False
 found_files = []
 
@@ -32,11 +32,11 @@ for file in os.listdir(data_dir):
 
     # Just save files that are not in out directory
     if is_in_data and not is_in_out:
-        found_current = Route(data_dir + file).save()
+        found_current = Route(data_dir + file).save(out_dir)
         if found_current:
-            print('FILE WILL BE SAVED (CURRENT ROUTE): ', file) # TO-DO
+            print('FILE WILL BE SAVED (CURRENT ROUTE): ', file)
         else:
-            print('FILE WILL BE SAVED (COMPLETED ROUTE): ', file) # TO-DO
+            print('FILE WILL BE SAVED (COMPLETED ROUTE): ', file)
     
     # File is not to be saved
     if is_in_data and is_in_out and not found_current:
@@ -54,11 +54,12 @@ if not found_current:
 
 for file in os.listdir(out_dir):
     # Just save files that end by .json and is not self
+    print(file)
     if file.endswith('.json') and file != 'records.json':
         found_files.append(file)
 
 # Create file
-records_file = open('../out/records.json', 'w')
+records_file = open(out_dir + 'records.json', 'w')
 
 # Create JSON
 records = json.dumps({"routes": found_files,})

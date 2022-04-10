@@ -64,8 +64,24 @@ function Map(props) {
     setMap(map);
   }, []);
 
-  const onUnmount = useCallback(function callback(map) {
+  const onUnmount = useCallback(function callback() {
     setMap(null);
+  }, []);
+
+  const fetchCenter = useCallback(function callback(road) {
+    let maxLat = -999;
+    let minLat = 999;
+    let maxLng = -999;
+    let minLng = 999;
+    road.forEach((coordinate) => {
+      // Get min and max lat
+      if (coordinate.lat > maxLat) maxLat = coordinate.lat;
+      if (coordinate.lat < minLat) minLat = coordinate.lat;
+      // Get min and max lng
+      if (coordinate.lng > maxLng) maxLng = coordinate.lng;
+      if (coordinate.lng < minLng) minLng = coordinate.lng;
+    });
+    return { lat: (maxLat + minLat) / 2, lng: (maxLng + minLng) / 2 };
   }, []);
 
   useEffect(() => {
@@ -74,13 +90,12 @@ function Map(props) {
       const { coordinates } = route;
       if (coordinates?.length > 0) {
         const road = fetchRoad(coordinates)?.data;
-        const { lat, lng } = road[0];
-        setCenter({
-          lat: lat - 0.004,
-          lng,
-        });
-        setInit(road[0]);
-        setEnd(road[road.length - 1]);
+        const center = fetchCenter(road);
+        const init = road[0];
+        const end = road[road.length - 1];
+        setCenter(center);
+        setInit(init);
+        setEnd(end);
         setRoad(road);
         map?.setZoom(ZOOM_VALUE);
       }

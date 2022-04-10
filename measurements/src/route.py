@@ -156,7 +156,7 @@ class Route():
 
     # File I/O
 
-    def save(self):
+    def save(self, dir):
         # When less than one coordinate no file will be saved
         if len(self.coordinates) < 1:
             return 0
@@ -167,7 +167,7 @@ class Route():
             name = "current"
             
         # Create file
-        write_file = open('../out/' + name + '.json', 'w')
+        write_file = open(dir + name + '.json', 'w')
 
         # Create JSON
         current = name == 'current'
