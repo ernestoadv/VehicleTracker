@@ -1,0 +1,99 @@
+body {
+  background-color: #ffffff;
+  color: hsl(0, 0%, 50%);
+  font-family: "Open Sans", sans-serif;
+  font-size: 14pt;
+}
+
+.map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: -webkit-fill-available;
+  width: -webkit-fill-available;
+  z-index: -1;
+}
+
+.measurements {
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.14);
+  display: grid;
+  grid-gap: 5vw;
+  grid-template-columns: 1fr 1fr 1fr;
+  position: absolute;
+  padding: 2% 2% 2% 2%;
+  margin: 24px 0;
+  left: 18vw;
+  bottom: 0;
+  width: 60vw;
+  @media (max-width: 1040px) {
+    font-size: 3vw;
+  }
+  @media (max-width: 640px) {
+    display: none;
+  }
+  @media (max-height: 640px) {
+    display: none;
+  }
+}
+
+.measurements > div {
+  align-content: flex-start;
+  display: grid;
+}
+
+.measurement-header {
+  border-bottom: 1px solid hsl(0, 0%, 80%);
+  display: flex;
+  font-size: 14pt;
+  justify-content: center;
+  width: 100%;
+  @media (min-width: 1600px) {
+    font-size: 20pt;
+  }
+}
+
+.measurement-content {
+  display: grid;
+  font-size: 10pt;
+  justify-content: center;
+  margin-top: 10px;
+  @media (min-width: 1600px) {
+    font-size: 15pt;
+  }
+}
+
+.measurement-content span {
+  padding: 2% 0;
+}
+
+.measurement-content label {
+  color: hsl(0, 0%, 20%);
+  font-weight: bold;
+}
+
+.routes {
+  position: absolute;
+  left: 33vw;
+  margin-top: 10px;
+  top: 0;
+  width: 33vw;
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+.css-1s2u09g-control {
+  border: none !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.14);
+  height: 40px;
+}
+
+.css-1pahdxg-control {
+  border: none !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 1px rgba(0, 0, 0, 0.14) !important;
+  height: 40px;
+}
