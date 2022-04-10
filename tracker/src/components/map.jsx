@@ -43,7 +43,6 @@ function Map(props) {
   const [init, setInit] = useState(null);
   const [map, setMap] = useState(null);
   const [road, setRoad] = useState(null);
-  const [zoom, setZoom] = useState(ZOOM_VALUE);
 
   const onCenter = useCallback(
     function callback() {
@@ -69,16 +68,6 @@ function Map(props) {
     setMap(null);
   }, []);
 
-  const onZoom = useCallback(
-    function callback() {
-      if (!map) return;
-      if (zoom !== map?.getZoom()) {
-        map?.setZoom(zoom);
-      }
-    },
-    [map, zoom]
-  );
-
   useEffect(() => {
     const { route } = props;
     if (route?.coordinates) {
@@ -93,7 +82,7 @@ function Map(props) {
         setInit(road[0]);
         setEnd(road[road.length - 1]);
         setRoad(road);
-        setZoom(ZOOM_VALUE);
+        map?.setZoom(ZOOM_VALUE);
       }
     }
   }, [props.route]);
@@ -112,8 +101,6 @@ function Map(props) {
           onCenterChanged={onCenter}
           onLoad={onLoad}
           onUnmount={onUnmount}
-          onZoomChanged={onZoom}
-          zoom={zoom}
         >
           {road && (
             <>

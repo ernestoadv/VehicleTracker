@@ -4,17 +4,22 @@ import Measurements from "./components/measurements";
 import Routes from "./components/routes";
 import "./app.css";
 
-const RECORDS_INTERVAL = 10;
+const UPDATE_ROUTE_INTERVAL = 3;
+const UPDATE_RECORDS_INTERVAL = 10;
 
 function App() {
+  const [file, setFile] = useState(null);
   const [records, setRecords] = useState(null);
   const [route, setRoute] = useState(null);
 
-  const onChangeRoute = (route) => {
+  const onChangeRoute = (file) => {
     new Promise((resolve) => {
-      const data = import("../data/" + route);
+      const data = import("../data/" + file);
       resolve(data);
-    }).then((data) => setRoute(data));
+    }).then((data) => {
+      setFile(file);
+      setRoute(data);
+    });
   };
 
   const onFetchRecords = () => {
@@ -29,10 +34,21 @@ function App() {
   };
 
   useEffect(() => {
+    const fetchRoute = setInterval(() => {
+      if (file === "current.json" || route?.current) {
+        onChangeRoute(file);
+      }
+    }, UPDATE_ROUTE_INTERVAL * 1000);
+    return () => {
+      clearInterval(fetchRoute);
+    };
+  }, [file, route]);
+
+  useEffect(() => {
     onFetchRecords();
     const fetchRecords = setInterval(() => {
       onFetchRecords();
-    }, RECORDS_INTERVAL * 1000);
+    }, UPDATE_RECORDS_INTERVAL * 1000);
     return () => {
       clearInterval(fetchRecords);
     };
