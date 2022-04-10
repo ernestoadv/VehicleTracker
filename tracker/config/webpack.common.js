@@ -29,10 +29,6 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new DotenvWebpackPlugin(),
-    new EnvironmentPlugin({
-      GOOGLE_MAPS_API_KEY: "AIzaSyCZgE5vU4EUwC3vqakIV4SPwJ79JcDYmX4",
-      ROADS_API: "https://roads.googleapis.com/v1/snapToRoads",
-    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),
