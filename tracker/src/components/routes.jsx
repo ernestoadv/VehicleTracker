@@ -2,8 +2,8 @@ import { memo, useEffect, useState } from "react";
 import Select from "react-select";
 
 function Routes(props) {
-  const [allRoutes, setAllRoutes] = useState([]);
-  const [currentRoute, setCurrentRoute] = useState(null);
+  const [current, setCurrent] = useState(null);
+  const [routes, setRoutes] = useState([]);
 
   const fetchRoutes = (routes) => {
     let allRoutes = [];
@@ -15,7 +15,7 @@ function Routes(props) {
       const name = route.split(".")[0];
       const option = {
         value: route,
-        label: name,
+        label: name === "current" ? "Current route" : name,
       };
       if (!allRoutes.includes(option)) {
         allRoutes.push(option);
@@ -27,23 +27,23 @@ function Routes(props) {
 
   useEffect(() => {
     const { routes } = props;
-    setAllRoutes(fetchRoutes(routes));
+    setRoutes(fetchRoutes(routes));
   }, [props.routes]);
 
   useEffect(() => {
     const { routes } = props;
-    setAllRoutes(fetchRoutes(routes));
+    setRoutes(fetchRoutes(routes));
   }, []);
 
   const onChange = (option) => {
     const { onChange } = props;
     onChange(option?.value);
-    setCurrentRoute(option);
+    setCurrent(option);
   };
 
   return (
     <div className="routes">
-      <Select onChange={onChange} options={allRoutes} value={currentRoute} />
+      <Select onChange={onChange} options={routes} value={current} />
     </div>
   );
 }
