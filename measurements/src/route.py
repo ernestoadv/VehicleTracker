@@ -87,6 +87,9 @@ class Route():
         if len(self.coordinates) < 1:
             return 0
 
+        if self.time_moving() <= 0:
+            return 0
+
         # Moving speed gets rid of stopped time to calculate the average speed
         # Return value in kilometers per hour (km/s -> km/h)
         return self.total_distance() / self.time_moving() * 3600
