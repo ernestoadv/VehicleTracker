@@ -81,8 +81,33 @@ function Map(props) {
       if (coordinate.lng > maxLng) maxLng = coordinate.lng;
       if (coordinate.lng < minLng) minLng = coordinate.lng;
     });
-    return { lat: (maxLat + minLat) / 2, lng: (maxLng + minLng) / 2 };
+    return { lat: (maxLat + minLat) / 2 - 0.001, lng: (maxLng + minLng) / 2 };
   }, []);
+
+  const fetchMarkers = useCallback(
+    function callback() {
+      let key = 0;
+      return road.map((marker, index) => {
+        if (index % 8 !== 0) return;
+        if ([init, end].includes(marker)) return;
+        key += 1;
+        return (
+          <Marker
+            key={key}
+            label={{
+              border: "solid 1px",
+              color: "#FFF",
+              fontSize: "12px",
+              fontWeight: "1200",
+              text: key.toString(),
+            }}
+            position={marker}
+          ></Marker>
+        );
+      });
+    },
+    [end, init, road]
+  );
 
   useEffect(() => {
     const { route } = props;
@@ -121,6 +146,7 @@ function Map(props) {
             <>
               <Marker position={init}></Marker>
               <Marker position={end} icon={EndIcon}></Marker>
+              {fetchMarkers()}
               <Polyline path={road} options={POLYLINE} />
             </>
           )}

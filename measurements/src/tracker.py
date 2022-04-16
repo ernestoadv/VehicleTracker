@@ -2,7 +2,6 @@ from pathlib import Path
 from route import Route
 import json, os
 
-
 #################################################
 ##              Tracker I/O logic              ##
 #################################################
