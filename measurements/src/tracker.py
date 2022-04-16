@@ -53,7 +53,6 @@ if not found_current:
 
 for file in os.listdir(out_dir):
     # Just save files that end by .json and is not self
-    print(file)
     if file.endswith('.json') and file != 'records.json':
         found_files.append(file)
 

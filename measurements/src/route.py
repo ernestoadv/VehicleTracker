@@ -17,8 +17,8 @@ import json, string, time
 DISTANCE_THRESHOLD = 10 
 
 # Minimum time difference to consider route current 
-# (In miliseconds)
-REAL_TIME_MINIMUM_GAP = 5 * 60 * 1000 
+# (In seconds)
+REAL_TIME_MINIMUM_GAP = 5 * 60 
 
 ##                                             ##
 ##          Coordinates data structure         ##
