@@ -100,9 +100,9 @@ function Measurements(props) {
               Average: <label>{averageSpeed?.value} </label>{" "}
               {averageSpeed?.unit}
             </span>
-            <span>
+            {/* <span>
               Max: <label>{maxSpeed?.value} </label> {maxSpeed?.unit}
-            </span>
+            </span> */}
             <span>
               Moving: <label>{movingSpeed?.value} </label> {movingSpeed?.unit}
             </span>
