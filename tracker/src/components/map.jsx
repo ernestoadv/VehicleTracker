@@ -9,7 +9,7 @@ import { fetchRoad } from "../utils/road.js";
 import EndIcon from "../../media/end.png";
 
 const CENTER_DISPLACEMENT = {
-  lat: -0.001,
+  lat: -0.15,
   lng: 0,
 };
 const DEFAULT_CENTER = {
@@ -37,7 +37,7 @@ const POLYLINE = {
   zIndex: 1,
 };
 const MARKER_BIAS = 6;
-const ZOOM_FACTOR = 0.00672;
+const ZOOM_FACTOR = 0.025;
 const ZOOM_VALUE = 16;
 
 function Map(props) {
@@ -89,12 +89,13 @@ function Map(props) {
     });
     return {
       center: {
-        lat: (maxLat + minLat) / 2 + CENTER_DISPLACEMENT.lat,
+        lat:
+          (maxLat + minLat) / 2 + (maxLat - minLat) * CENTER_DISPLACEMENT.lat,
         lng: (maxLng + minLng) / 2,
       },
       end: road[road.length - 1],
       init: road[0],
-      zoom: ZOOM_VALUE * (ZOOM_FACTOR / (maxLat - minLat)),
+      zoom: ZOOM_VALUE - (maxLat - minLat) / ZOOM_FACTOR,
     };
   }, []);
 
