@@ -10,6 +10,8 @@ function Routes(props) {
 
     if (!routes) return;
 
+    routes = routes.sort((a, b) => b.localeCompare(a));
+
     // Populate routes array
     routes.forEach((route) => {
       const name = route.split(".")[0];

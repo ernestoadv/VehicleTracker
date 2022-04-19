@@ -8,6 +8,10 @@ import { useCallback, useEffect, useState } from "react";
 import { fetchRoad } from "../utils/road.js";
 import EndIcon from "../../media/end.png";
 
+const CENTER_DISPLACEMENT = {
+  lat: -0.15,
+  lng: 0,
+};
 const DEFAULT_CENTER = {
   lat: 40.45319339070344,
   lng: -3.7336413128108963,
@@ -32,6 +36,8 @@ const POLYLINE = {
   radius: 30000,
   zIndex: 1,
 };
+const MARKER_BIAS = 6;
+const ZOOM_FACTOR = 0.025;
 const ZOOM_VALUE = 16;
 
 function Map(props) {
@@ -68,7 +74,7 @@ function Map(props) {
     setMap(null);
   }, []);
 
-  const fetchCenter = useCallback(function callback(road) {
+  const fetchBounds = useCallback(function callback(road) {
     let maxLat = -999;
     let minLat = 999;
     let maxLng = -999;
@@ -81,26 +87,58 @@ function Map(props) {
       if (coordinate.lng > maxLng) maxLng = coordinate.lng;
       if (coordinate.lng < minLng) minLng = coordinate.lng;
     });
-    return { lat: (maxLat + minLat) / 2, lng: (maxLng + minLng) / 2 };
+    return {
+      center: {
+        lat:
+          (maxLat + minLat) / 2 + (maxLat - minLat) * CENTER_DISPLACEMENT.lat,
+        lng: (maxLng + minLng) / 2,
+      },
+      end: road[road.length - 1],
+      init: road[0],
+      zoom: ZOOM_VALUE - (maxLat - minLat) / ZOOM_FACTOR,
+    };
   }, []);
 
+  const fetchMarkers = useCallback(
+    function callback() {
+      let key = 0;
+      return road.map((marker, index) => {
+        if (index % MARKER_BIAS !== 0) return;
+        if ([init, end].includes(marker)) return;
+        key += 1;
+        return (
+          <Marker
+            key={key}
+            label={{
+              border: "solid 1px",
+              color: "#FFF",
+              fontSize: "12px",
+              fontWeight: "1200",
+              text: key.toString(),
+            }}
+            position={marker}
+          ></Marker>
+        );
+      });
+    },
+    [end, init, road]
+  );
+
   useEffect(() => {
-    const { route } = props;
+    const { api, route } = props;
     if (route?.coordinates) {
       const { coordinates } = route;
       if (coordinates?.length > 0) {
-        const road = fetchRoad(coordinates)?.data;
-        const center = fetchCenter(road);
-        const init = road[0];
-        const end = road[road.length - 1];
+        const road = api ? fetchRoad(coordinates)?.data : coordinates;
+        const { center, end, init, zoom } = fetchBounds(road);
         setCenter(center);
         setInit(init);
         setEnd(end);
         setRoad(road);
-        map?.setZoom(ZOOM_VALUE);
+        map?.setZoom(zoom);
       }
     }
-  }, [props.route]);
+  }, [props.api, props.route]);
 
   return (
     <div className="map">
@@ -121,6 +159,7 @@ function Map(props) {
             <>
               <Marker position={init}></Marker>
               <Marker position={end} icon={EndIcon}></Marker>
+              {fetchMarkers()}
               <Polyline path={road} options={POLYLINE} />
             </>
           )}

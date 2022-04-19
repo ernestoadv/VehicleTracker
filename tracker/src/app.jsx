@@ -2,12 +2,15 @@ import { memo, useEffect, useState } from "react";
 import Map from "./components/map";
 import Measurements from "./components/measurements";
 import Routes from "./components/routes";
-import "./app.css";
+import Toggle from "./components/toggle";
+import "./style/app.css";
 
 const UPDATE_ROUTE_INTERVAL = 3;
 const UPDATE_RECORDS_INTERVAL = 10;
+const USE_API_BY_DEFAULT = false;
 
 function App() {
+  const [api, setApi] = useState(USE_API_BY_DEFAULT);
   const [file, setFile] = useState(null);
   const [records, setRecords] = useState(null);
   const [route, setRoute] = useState(null);
@@ -33,6 +36,10 @@ function App() {
     });
   };
 
+  const onEnableApi = (event) => {
+    setApi(event?.target.checked ?? false);
+  };
+
   useEffect(() => {
     const fetchRoute = setInterval(() => {
       if (file === "current.json" || route?.current) {
@@ -56,9 +63,14 @@ function App() {
 
   return (
     <>
-      <Map route={route}></Map>
-      <Routes routes={records?.routes} onChange={onChangeRoute}></Routes>
+      <Map api={api} route={route}></Map>
       <Measurements route={route}></Measurements>
+      <Routes routes={records?.routes} onChange={onChangeRoute}></Routes>
+      <Toggle
+        defaultChecked={USE_API_BY_DEFAULT}
+        name={"API"}
+        onChange={onEnableApi}
+      ></Toggle>
     </>
   );
 }

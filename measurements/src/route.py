@@ -17,8 +17,8 @@ import json, string, time
 DISTANCE_THRESHOLD = 10 
 
 # Minimum time difference to consider route current 
-# (In miliseconds)
-REAL_TIME_MINIMUM_GAP = 5 * 60 * 1000 
+# (In seconds)
+REAL_TIME_MINIMUM_GAP = 5 * 60 
 
 ##                                             ##
 ##          Coordinates data structure         ##
@@ -85,6 +85,9 @@ class Route():
     def moving_speed(self):
         # When less than one coordinate no speed can be provided
         if len(self.coordinates) < 1:
+            return 0
+
+        if self.time_moving() <= 0:
             return 0
 
         # Moving speed gets rid of stopped time to calculate the average speed
