@@ -1,0 +1,176 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+from bdb import GENERATOR_AND_COROUTINE_FLAGS
+import os
+import RPi.GPIO as GPIO
+import paho.mqtt.client as mqtt
+import serial
+import time
+from datetime import datetime
+
+gts = 0
+gts0 = 0
+gLat0 = 40.439998
+gLon0 = -3.670002
+
+ser = serial.Serial('/dev/ttyS0',115200)
+ser.flushInput()
+
+BROKER="10.8.1.15"
+
+power_key = 4
+rec_buff = ''
+rec_buff2 = ''
+time_count = 0
+gPosiciones = 0
+
+def logit (cadena):
+	now = datetime.now()
+	cdnow=now.strftime('%y%m%d-%H%M%S')
+	print(cdnow + ' [' + cadena + ']')
+	with open('/var/log/gps.log','a') as f:
+		print(cdnow + ' [' + cadena + ']',file=f)
+	f.close()
+
+def send_at(command,back,timeout):
+	global gPosiciones
+	global gLat0
+	global gLon0
+	rec_buff = ''
+	ser.write((command+'\r\n').encode())
+	time.sleep(timeout)
+	if ser.inWaiting():
+		time.sleep(0.01 )
+		rec_buff = ser.read(ser.inWaiting())
+	if rec_buff != '':
+		if back not in rec_buff.decode():
+			logit(command + ' ERROR')
+			logit(command + ' back:\t' + rec_buff.decode())
+			return 0
+		else:
+			#logit(rec_buff.decode())
+			#now = datetime.now()
+			#txy = now.strftime("%s")
+			txy = ''
+			res = rec_buff.decode()
+			logit(res)
+			campos = res.split(",")
+			if len(campos) > 4:
+				latitud=float(campos[3])
+				longitud=float(campos[4])
+				if latitud == gLat0 and longitud == gLon0: return 2
+			for x in campos[3:5]:
+				txy = txy + ',' + x
+			if len(txy)>18:
+				gPosiciones += 1
+				mensaje=',' + str(gPosiciones) + txy
+				logit("publish to gps: " + mensaje)
+				client.publish("gps",mensaje)
+			return 1
+	else:
+		logit('GPS is not ready')
+		return 0
+
+def get_gps_position():
+	global gts
+	global gts0
+	rec_null = True
+	answer = 0
+	logit('Start GPS session...')
+	rec_buff = ''
+	send_at('AT+CGNSPWR=1','OK',1)
+	time.sleep(2)
+	while rec_null:
+		answer = send_at('AT+CGNSINF','+CGNSINF: ',1)
+		if 1 == answer:
+			answer = 0
+			if ',,,,,,' in rec_buff or '0.00000' in rec_buff:
+				logit('GPS is not ready')
+				rec_null = False
+				time.sleep(1)
+		else:
+			print('error %d'%answer)
+			rec_buff = ''
+			send_at('AT+CGNSPWR=0','OK',1)
+			return False
+		time.sleep(19)
+		# comprueba conexion broker - se está actualizando gts
+		# si no se está actualizando finaliza para que se reinice la conexión con el servicio
+		if gts == 0:
+			gts0 += 1
+			if gts0 > 15:
+				logit("gts=0 no actualizada hora tras 15 posiciones -> FINALIZA")
+				return False
+		else:
+			if gts0>0: gts0=0
+			now = datetime.now()
+			cdnow = now.strftime('%s')
+			tsnow = int(cdnow)
+			if abs(tsnow-gts) > 300:
+				logit("más de 5 minutos diferencia con gts broker -> FINALIZA")
+				return False
+
+def power_on(power_key):
+	logit('SIM7080X is starting:')
+	GPIO.setmode(GPIO.BCM)
+	GPIO.setwarnings(False)
+	GPIO.setup(power_key,GPIO.OUT)
+	time.sleep(0.1)
+	GPIO.output(power_key,GPIO.HIGH)
+	time.sleep(1)
+	GPIO.output(power_key,GPIO.LOW)
+	time.sleep(1)
+	ser.flushInput()
+	logit('SIM7080X is ready')
+
+def power_down(power_key):
+	logit('SIM7080X is loging off:')
+	GPIO.output(power_key,GPIO.HIGH)
+	time.sleep(1)
+	GPIO.output(power_key,GPIO.LOW)
+	time.sleep(2)
+	logit('Good bye')
+
+def trata(cadenats):
+	global gts
+	ts=int(cadenats)
+	now = datetime.now()
+	cdnow = now.strftime('%s')
+	tsnow = int(cdnow)
+	if abs(ts-tsnow)>2:
+		logit("tslocal " + cdnow + " -> tsbroker " + cadenats)
+		comando="date +%s -s @" + cadenats
+		rdo=os.system(comando)
+		logit("rdo:" + str(rdo) + " comando:" + comando)
+	else: logit("tslocal " + cdnow + " ~= tsbroker " + cadenats)
+	if gts > 0: logit("gts actualizado") 
+	else: logit("gts inicializado") 
+	gts=ts
+
+#define callback
+def on_message(client, userdata, message):
+    time.sleep(1)
+    trata(str(message.payload.decode("utf-8")))
+    mensaje=str(message.payload.decode("utf-8"))
+    logit("received message = " + mensaje)
+
+client = mqtt.Client('gps')
+client.username_pw_set(username="gps",password="mosquittogps")
+client.on_message=on_message
+logit('conexión a broker MQTT')
+client.connect(BROKER)
+client.loop_start()
+logit('suscripción a ts')
+client.subscribe("ts")
+logit('power ON gps')
+power_on(power_key)
+logit('recolecta posiciones del GPS')
+get_gps_position()
+client.loop_stop()
+logit('desconexión del broker MQTT')
+client.disconnect()
+logit('FINALIZA')
+power_down(power_key)
+if ser != None:
+		ser.close()
+		GPIO.cleanup()	

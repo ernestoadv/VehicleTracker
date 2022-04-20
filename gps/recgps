@@ -1,0 +1,143 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+from operator import gt
+import time
+import paho.mqtt.client as mqtt
+from datetime import datetime
+
+BROKER="localhost"
+#DIR_DATOS = "/home/it/Proyecto/data/"
+DIR_DATOS = "/home/it/EAV/VehicleTracker/measurements/data/"
+DXY = 0.0001
+
+gFichero = "/tmp/datos.txt"
+gPos = 0
+gRut = 0
+gSeg = 0
+gStop = 0
+gLat = 0.0
+gLon = 0.0
+gLat0 = 40.439998
+gLon0 = -3.670002
+
+def logit (cadena):
+	now = datetime.now()
+	cdnow=now.strftime('%y%m%d-%H%M%S')
+	print(cdnow + ' ' + cadena)
+	with open('/var/log/recgps.log','a') as f:
+		print(cdnow + ' ' + cadena,file=f)
+	f.close()
+
+def grabaxy (cadena):
+	global gFichero
+	global gPos
+	global gRut
+	global gSeg
+	global gStop
+	global gLat
+	global gLon
+	global gLat0
+	global gLon0
+
+	now = datetime.now()
+	tsnow = now.strftime('%s')
+	seg = int(tsnow)
+	campos = cadena.split(",")
+	lat = float(campos[2])
+	lon = float(campos[3])
+	dlat = abs(gLat-lat)
+	dlon = abs(gLon-lon)
+	dseg = abs(gSeg-seg)
+	dlat0 = abs(gLat0-lat)
+	dlon0 = abs(gLon0-lon)
+
+	# Comprobación de coordenadas diferentes a las gLat0,gLon0 que se reciben cuando aún no son exactas
+	if dlat0<DXY and dlon0<DXY :
+		logit('0,0 ' + str(dlat0) + ' ' + str(dlon0) + ' ' + str(DXY))
+		return
+
+	# Comprueba si se mueve
+	seMueve = False
+	if dlat > DXY or dlon > DXY: 
+		seMueve = True
+		gStop = 0
+		logit('> ' + str(gStop))
+	else: 
+		seMueve = False
+		gStop += 1
+		logit('. ' + str(gStop))
+
+	# Ruta
+	gPos += 1	
+	# Prepara fichero de ruta para grabar los datos que va recibiendo
+	# Si es la primera posición prepara fichero de ruta
+	# Si no comprueba
+	# Si no se mueve durante 15 minutos vuelca datos en siguiente fichero ymdHM.xy
+	if gPos == 1:
+		gFichero = DIR_DATOS + now.strftime('%y%m%d-%H%M.txt')
+		logit('nuevo fichero de ruta ' + gFichero)
+		gRut = 0
+	else:
+		if dseg > 300: 
+			logit('dseg ' + str(dseg))
+			logit('ha estado más de 5 minutos sin haber recibido datos -> no graba más en fichero de ruta anterior ' + gFichero)
+			gFichero = DIR_DATOS + now.strftime('%y%m%d-%H%M.txt')
+			logit('nuevo fichero de ruta ' + gFichero)
+			gRut = 0
+		else:
+			if gStop>90: 
+				logit('90 posiciones (30 minutos) parado -> termina fichero de ruta ' + gFichero)
+				gFichero = DIR_DATOS + now.strftime('%y%m%d-%H%M.txt')
+				logit('nuevo fichero de ruta ' + gFichero)
+				gRut = 0
+				gStop = 0
+
+
+	# Se empiezan a grabar coordenadas de la ruta cuando se detecta que empieza a moverse
+	if gRut == 0:
+		if seMueve:
+			gRut = 1
+	else:
+		gRut += 1
+
+	if gRut > 0:
+		#logit('_-_-_-_-')
+		gLat = lat
+		gLon = lon
+		gSeg = seg
+		with open(gFichero,'a') as f:
+			#tmxy = tsnow + ',' + str(gRut) + ',' + str(lat) + ',' + str(lon)
+			txy = tsnow + ',' + str(lat) + ',' + str(lon)
+			print(txy,file=f)
+		f.close()
+		logit('grabado: ' + txy)
+	else: logit('.')
+
+#define callback
+def on_message(client, userdata, message):
+    time.sleep(1)
+    logit("received message =" + str(message.payload.decode("utf-8")))
+    mensaje=str(message.payload.decode("utf-8"))
+    if len(mensaje)>18 and mensaje[1:1]!="0": grabaxy(mensaje)
+
+client = mqtt.Client('recgps')
+client.username_pw_set(username="gps",password="mosquittogps")
+######Bind function to callback
+client.on_message=on_message
+#####
+logit("connecting to " + BROKER)
+client.connect(BROKER)#connect
+client.loop_start() #start loop to process received messages
+logit("subscribing to gps")
+client.subscribe("gps")#subscribe
+bucle = True
+while bucle:
+	now = datetime.now()
+	tsnow = now.strftime('%s')
+	logit("publica ts " + tsnow)
+	client.publish("ts",tsnow)
+	time.sleep(120)
+
+client.loop_stop() #stop loop
+client.disconnect() #disconnect
+

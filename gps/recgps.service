@@ -1,0 +1,17 @@
+[Unit]
+Description=GPS Recibe
+After=network.target
+ 
+[Service]
+User=root
+Group=root
+UMask=0002
+ExecStart=/usr/local/bin/recgps
+StandardOutput=syslog
+StandardError=syslog
+RestartSec=10
+Restart=always
+ 
+[Install]
+Alias=recgps.service
+WantedBy=multi-user.target

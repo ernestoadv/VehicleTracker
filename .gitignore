@@ -104,9 +104,4 @@ dist
 .tern-port
 
 # Api keys
-.env 
-
-# Data files
-tracker/data
-measurements/data
-measurements/out
+.env
